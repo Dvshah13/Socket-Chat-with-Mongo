@@ -10,18 +10,33 @@ app.get('/', function(req, res){
     res.sendFile(__dirname + '/index.html');
 });
 
-io.socket.on('connection', function(socket){
+io.sockets.on('connection', function(socket){
     socket.on('new user', function(data, callback){
         if (nicknames.indexOf(data) != -1) {
             callback(false);
         }
+        else {
+            callback(true);
+            socket.nickname = data;
+            nicknames.push(socket.nickname);
+            updateNicknames();
+        }
     });
 })
 
+function updateNicknames() {
+    io.sockets.emit('usernames', nicknames)
+}
+
 io.sockets.on('connection', function(socket){
     socket.on('send message', function(data){
-        io.sockets.emit('new message', data);
+        io.sockets.emit('new message', {msg: data, nickname: socket.nickname});
         //to send to every user besides one who sent message use code below:
         // socket.broadcast.emit('new message', data);
     });
+socket.on('disconnect', function(data){
+    if (!socket.nickname) return;
+    nicknames.splice(nicknames.indexOf(socket.nickname), 1);
+    updateNicknames();
+})
 });

@@ -23,6 +23,7 @@
             <p>
                 Enter a username:
             </p>
+            <p id="nicknameError"></p>
             <form id="setNickname">
                 <input size="35" id="nickname" />
                 <input type="submit" />
@@ -46,28 +47,43 @@
             var socket = io.connect();
             var $messageForm = $('#send-message');
             var $nicknameForm = $('#setNickname');
-            var $nicknameError = $('nicknameError');
-            var $nicknameBox = $('nickname');
+            var $nicknameError = $('#nicknameError');
+            var $nicknameBox = $('#nickname');
+            var $users = $('#users');
             var $messageBox = $('#message');
             var $chat = $('#chat');
 
             $nicknameForm.submit(function(e){
                 e.preventDefault();
-                socket.emit('new user', $nicknameBox.val() function(data){
-
+                socket.emit('new user', $nicknameBox.val(), function(data){
+                    if (data) {
+                        $('#nicknameWrap').hide();
+                        $('#contentWrap').show();
+                    }
+                    else {
+                        $nicknameError.html('That username is already taken, try again!')
+                    }
                 });
                 $nicknameBox.val('');
+            });
+
+            socket.on('usernames', function(data){
+                var html = '';
+                for (i=0; i < data.length; i++) {
+                    html += data[i] + '</br/>'
+                }
+                $users.html(html)
             });
 
 
             $messageForm.submit(function(e){
                 e.preventDefault();
                 socket.emit('send message', $messageBox.val());
-                messageBox.val('');
+                $messageBox.val('');
             });
 
             socket.on('new message', function(data){
-                $chat.append(data + "<br/>");
+                $chat.append('<b>' + data.nickname + ': </b>' + data.msg + "<br/>");
             });
         });
         </script>
