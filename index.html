@@ -102,7 +102,9 @@
             });
 
             function displayMsg(data) {
-                $chat.append('<span class="msg"><b>' + data.nickname + ': </b>' + data.msg + "</span><br/>");
+                var dt = new Date();
+                var time = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+                $chat.append('<span class="msg"><b>' + data.nickname + ' (' + time + '): </b>' + data.msg + "</span><br/>");
             }
 
             socket.on('private', function(data){
