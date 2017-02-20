@@ -49,7 +49,7 @@ function updateNicknames() {
 io.sockets.on('connection', function(socket){
     var query = Chat.find({});
     // sort via descending to show last 10 messages
-    query.sort('-created')limit(10).exec(function(err, docs){
+    query.sort('-created').limit(10).exec(function(err, docs){
         if (err) throw err;
         console.log('Sending old messages')
         socket.emit('Load old messages', docs);
